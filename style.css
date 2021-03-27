@@ -95,7 +95,7 @@ nav {
 
   /* NOTE This creates the fade in/out anumation */
   transition: all 1s;
-  /* opacity: 0; */
+  opacity: 0;
 }
 
 .balance {

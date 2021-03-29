@@ -61,12 +61,13 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const displayMovements = function (movements) {
+const displayMovements = function (movements, sort = false) {
   // crear movements container
   containerMovements.innerHTML = '';
 
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
   //Creating html element for each movement in the array
-  movements.forEach(function (movement, index) {
+  movs.forEach(function (movement, index) {
     const movementType = movement > 0 ? 'deposit' : 'withdrawal';
     const html = `
     <div class="movements__row">
@@ -169,3 +170,72 @@ btnTransfer.addEventListener('click', function (e) {
   }
   updateUI(currentAccount);
 });
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount / 10)) {
+    //Add movement
+    currentAccount.movements.push(amount);
+    updateUI(currentAccount);
+  }
+});
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  if (
+    currentAccount.username === inputCloseUsername.value &&
+    currentAccount.pin === Number(inputClosePin.value)
+  ) {
+    const index = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+
+    inputCloseUsername.value = inputClosePin.value = '';
+    //Delete account
+    accounts.splice(index, 1);
+
+    //Logout deleted user(hide UI)
+    containerApp.style.opacity = 0;
+  }
+});
+let sorted = false;
+
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted;
+});
+
+//Get all movements from the UI
+labelBalance.addEventListener('click', function () {
+  const movementsUI = Array.from(
+    document.querySelectorAll('.movements__value'),
+    el => Number(el.textContent.replace('€', ''))
+  );
+  console.log(movementsUI);
+});
+
+///////////////////////////////////
+
+/*
+const accountMovements = accounts.map(acc => acc.movements);
+console.log(accountMovements);
+
+const allMovements = accountMovements.flat();
+
+console.log(allMovements);
+const sum = allMovements.reduce((acc, curr) => acc + curr, 0);
+console.log(sum);
+
+const overallBalance = accounts
+  .map(acc => acc.movements)
+  .flat()
+  .reduce((acc, curr) => acc + curr, 0);
+console.log(overallBalance);
+
+const overallBalance2 = accounts
+  .flatMap(acc => acc.movements)
+  .reduce((acc, curr) => acc + curr, 0);
+console.log(overallBalance2);
+*/
